@@ -1,0 +1,29 @@
+{
+  "name": "product-cdc-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "plugin.name": "pgoutput",
+    "database.hostname": "product-service-database.local",
+    "database.port": "5432",
+    "database.user": "masteruser",
+    "database.password": "masterpass",
+    "database.dbname" : "application_db",
+    "database.server.name": "ecommerce-product-database",
+    "table.include.list": "public.product",
+    "transforms": "Routing,unwrap,ValueToKey,SetKeySchema,SetValueSchema",
+    "transforms.Routing.type": "io.debezium.transforms.ByLogicalTableRouter",
+    "transforms.Routing.topic.regex": ".*",
+    "transforms.Routing.topic.replacement": "ecommerce-product-cdc-topic",
+    "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+    "transforms.ValueToKey.type": "org.apache.kafka.connect.transforms.ValueToKey",
+    "transforms.ValueToKey.fields": "product_id",
+    "transforms.SetKeySchema.type": "org.apache.kafka.connect.transforms.SetSchemaMetadata$Key",
+    "transforms.SetKeySchema.schema.name": "ionutbalosin.training.ecommerce.message.schema.product.ProductCdcKey",
+    "transforms.SetValueSchema.type": "org.apache.kafka.connect.transforms.SetSchemaMetadata$Value",
+    "transforms.SetValueSchema.schema.name": "ionutbalosin.training.ecommerce.message.schema.product.ProductCdcValue",
+    "key.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "key.converter.schema.registry.url": "http://schema-registry.local:18081",
+    "value.converter.schema.registry.url": "http://schema-registry.local:18081"
+  }
+}

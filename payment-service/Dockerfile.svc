@@ -1,0 +1,6 @@
+FROM azul/zulu-openjdk:17.0.2
+
+ARG JAR_FILE=/target/ecommerce-payment-service-0.0.1-SNAPSHOT.jar
+COPY ${JAR_FILE} payment-service.jar
+
+ENTRYPOINT ["java","-jar","payment-service.jar", "--server.port=8080"]

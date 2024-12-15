@@ -1,0 +1,46 @@
+{
+	"type": "record",
+	"name": "TriggerPaymentCommand",
+	"namespace": "ionutbalosin.training.ecommerce.message.schema.payment",
+	"fields": [
+		{
+			"name": "id",
+			"type": {
+				"type": "string",
+				"logicalType": "uuid"
+			}
+		},
+		{
+			"name": "userId",
+			"type": {
+				"type": "string",
+				"logicalType": "uuid"
+			}
+		},
+		{
+			"name": "orderId",
+			"type": {
+				"type": "string",
+				"logicalType": "uuid"
+			}
+		},
+		{
+			"name": "description",
+			"type": "string"
+		},
+		{
+			"name": "amount",
+			"type": "double"
+		},
+		{
+			"name": "currency",
+			"type": {
+				"type": "enum",
+				"name": "PaymentCurrency",
+				"symbols": [
+					"EUR"
+				]
+			}
+		}
+	]
+}

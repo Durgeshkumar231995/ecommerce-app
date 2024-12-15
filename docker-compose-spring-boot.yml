@@ -1,0 +1,88 @@
+version: '3.5'
+services:
+  #------------------#
+  # Producer Service #
+  #------------------#
+  product-service:
+    # Note: horizontal scalability clashes with container names
+    #container_name: product-service.local
+    image: product-service:local
+    ports:
+      - 15080-15081:8080
+      - 15000-15001:8000
+    depends_on:
+      - product-service-database
+    networks:
+      - ecommerce-network
+    environment:
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n
+      - SPRING_PROFILES_ACTIVE=dockerlocal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.product-service.rule=PathPrefix(`/products`)
+      - traefik.http.services.product-service.loadbalancer.server.port=8080
+  #-----------------------#
+  # Shopping Cart Service #
+  #-----------------------#
+  shopping-cart-service:
+    container_name: shopping-cart-service.local
+    image: shopping-cart-service:local
+    ports:
+      - 25080:8080
+      - 25000:8000
+    depends_on:
+      - shopping-cart-service-database
+      - kafka
+    networks:
+      - ecommerce-network
+    environment:
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n
+      - SPRING_PROFILES_ACTIVE=dockerlocal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.shopping-cart-service.rule=PathPrefix(`/cart`)
+      - traefik.http.services.shopping-cart-service.loadbalancer.server.port=8080
+  #---------------#
+  # Order Service #
+  #---------------#
+  order-service:
+    container_name: order-service.local
+    image: order-service:local
+    ports:
+      - 35080:8080
+      - 35000:8000
+    depends_on:
+      - order-service-database
+      - kafka
+    networks:
+      - ecommerce-network
+    environment:
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n
+      - SPRING_PROFILES_ACTIVE=dockerlocal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.order-service.rule=PathPrefix(`/orders`)
+      - traefik.http.services.order-service.loadbalancer.server.port=8080
+  #-----------------#
+  # Payment Service #
+  #-----------------#
+  payment-service:
+    container_name: payment-service.local
+    image: payment-service:local
+    ports:
+      - 45080:8080
+      - 45000:8000
+    depends_on:
+      - kafka
+    networks:
+      - ecommerce-network
+    environment:
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n
+      - SPRING_PROFILES_ACTIVE=dockerlocal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.payment-service.rule=Host(`localhost`)
+      - traefik.http.services.payment-service.loadbalancer.server.port=8080
+networks:
+  ecommerce-network:
+    name: ecommerce-app
